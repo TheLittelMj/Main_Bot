@@ -1,0 +1,216 @@
+import discord
+import requests
+import json
+import random
+from replit import db
+
+#autotolr
+#beleidigungsfilter
+#twitch conn für die msg @ in dc channel
+
+from keep_alive import keep_alive
+
+#verbingung zum discord server
+client = discord.Client()
+
+#liste von den wörtergruppen
+Call_Ibel1 = ["Madara Uchiha?"]
+Call_Ibel2_List = ["Ich bin hier bro aber ist senti da?"]
+
+Madara_gespräch1 = ["malada"]
+Madara_gespräch1_List = ["willst du mich verarschen du Bastard? Spast"]
+
+Madara_gespräch2 = ["ja bro chill doch"]
+Madara_gespräch2_List = ["du machst das immer aber was ist unser job?"]
+
+creator = ["creator", "erfinder"]
+Dalian = ["yahoo", "Yahoo"]
+meme = ["siptest"]
+meme_game = ["$zahlgame"]
+meme_game1 = ["$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8", "$9"]
+f_dich = ["F bro", "f bro"]
+
+#liste von den wörtergruppen deren antwort
+Dalian_List = ["Lets go Dalian<3!"]
+SchwanzLänge_List = [
+    "(=|", "(====|", "(=======|", "(===================================|"
+]
+meme_game_list = [
+    "welche zahl habe in meinem kopf? schreibe bitte :$__   <==dann deine zahl(tipp es geht nur 1-9)"
+]
+meme_game1_List = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+creator_List = ["das bin :heart: ich :yum:"]
+
+if "responding" not in db.keys():
+    db["responding"] = True
+
+#erstellt eine qoute????
+def get_quote():
+    response = requests.get("https://zenquotes.io/api/random")
+    json_data = json.loads(response.text)
+    quote = json_data[0]['q'] + " -" + json_data[0]['a']
+    return (quote)
+
+#?????????????????????????
+def update_encouragements(encouraging_message):
+    if "encouragements" in db.keys():
+        encouragements = db["encouragements"]
+        encouragements.append(encouraging_message)
+        db["encouragements"] = encouragements
+    else:
+        db["encouragements"] = [encouraging_message]
+
+#???????????????
+def delet_encouragement(index):
+    encouragements = db["encouragements"]
+    if len(encouragements) > index:
+        del encouragements[index]
+        db["encouragements"] = encouragements
+
+#gibt eine nachricht wann er fertig mit der anmeldung ist mit dem discord server
+@client.event
+async def on_ready():
+    print('WE have logged in as {0.user}'.format(client))
+
+#auf eine nachricht reagieren das event von discord
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    #keine ahnung???????????????????????
+    msg = message.content
+
+    if any(word in msg for word in f_dich):
+        embed = discord.Embed(title="F.Gif",
+                              description="Desc",
+                              color=0x00ff00)  #creates embed
+        file = discord.File("fuc.gif", filename="fuc.gif")
+        embed.set_image(url="attachment://image.png")
+        await message.channel.send(file=file)
+
+    if message.content == 'Kriese':
+        embed = discord.Embed(title="Vallah_Kriese.gif",
+                              description="Desc",
+                              color=0x00ff00)  #creates embed
+        file = discord.File("Vallah_Kriese.gif", filename="Vallah_Kriese.gif")
+        embed.set_image(url="attachment://image.png")
+        await message.channel.send(file=file)
+
+    if message.content == 'Dey':
+        embed = discord.Embed(title="Dalian_goBrrr.gif",
+                              description="Desc",
+                              color=0x00ff00)  #creates embed
+        file = discord.File("Dalian_goBrrr.gif", filename="Dalian_goBrrr.gif")
+        embed.set_image(url="attachment://image.png")
+        await message.channel.send(file=file)
+
+    # kopier die nachricht und nehme sie als spitzname
+    print(type(message.channel))
+    if str(message.channel) == "madara_akte":
+        print("true")
+        await client.guilds[0].get_member(client.user.id).edit(nick=msg)
+
+    #wenn die nachricht dann????????
+    if msg.startswith('$hallo'):
+        quote = get_quote()
+        await message.channel.send(quote)
+
+    #seine optionen zu antworten bei der anfrage auf gruppenwörter
+    options = Dalian_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    #wenn ein wort aus der gtuppe kommtanfrage dann antwortet er mit der andere gruppe
+    if any(word in msg for word in Dalian):
+        await message.channel.send(random.choice(Dalian_List))
+         
+    #nimmt ein file/bild und schickt es in den angefragten channel ein und erwiedert die anfrage so gesehen
+
+    if any(word in msg for word in creator):
+        file = discord.File("creator.jpg", filename="image.jpg")
+        embed = discord.Embed()
+        embed.set_image(url="attachment://image.jpg")
+        await message.channel.send(file=file, embed=embed)
+
+        options = creator_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+    if any(word in msg for word in creator):
+        await message.channel.send(random.choice(creator_List))
+
+    options = SchwanzLänge_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in meme):
+        await message.channel.send(random.choice(SchwanzLänge_List))
+
+    options = meme_game_list
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in meme_game):
+        await message.channel.send(random.choice(meme_game_list))
+
+        options = meme_game1_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in meme_game1):
+        await message.channel.send(random.choice(meme_game1_List))
+
+        options = Call_Ibel2_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in Call_Ibel1):
+        await message.channel.send(random.choice(Call_Ibel2_List))
+
+        options = Madara_gespräch1_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in Madara_gespräch1):
+        await message.channel.send(random.choice(Madara_gespräch1_List))
+
+        options = Madara_gespräch2_List
+    if "encouragements" in db.keys():
+        options = options + db["encouragements"]
+
+    if any(word in msg for word in Madara_gespräch2):
+        await message.channel.send(random.choice(Madara_gespräch2_List))
+
+#????????????????????????ß
+    if msg.startswith("$new"):
+        encouraging_message = msg.split("$new ", 1)[1]
+        update_encouragements(encouraging_message)
+        await message.channel.send("New encouraging message added.")
+
+    #hier mit löscht man hinzugefügte commands vom dc chat die in die datenbank von relipt einfügt wurde
+    if msg.startswith("$del"):
+        encouragements = []
+        if "encouragements" in db.keys():
+            index = int(msg.split("$del", 1)[1])
+            delet_encouragement(index)
+            encouragements = db["encouragements"]
+        await message.channel.send(encouragements)
+
+    if msg.startswith("$list"):
+        encouragements = []
+        if "encouragements" in db.keys():
+            encouragements = db["encouragements"]
+        await message.channel.send(encouragements)
+
+    if msg.startswith("$responding"):
+        value = msg.split("$responding ", 1)[1]
+
+        if value.lower() == "true":
+            db["responding"] = True
+            await message.channel.send("Responding is on.")
+        else:
+            db["responding"] = False
+        await message.channel.send("Responding is off.")
+
+#der token vom bot agent_boi
+keep_alive()
+client.run('ODk5MDMyMTAwMTM5ODMxNDA3.YWs24w.03yDerLST5VHcAIGowK-Opjc808')
